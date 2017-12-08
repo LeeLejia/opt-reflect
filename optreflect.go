@@ -19,7 +19,7 @@ type empty struct {
 	ptr unsafe.Pointer
 }
 /**
-获取表名称
+获取结构名称
  */
 func (t *OptReflect) GetStructName() string{
 	return t.structName
