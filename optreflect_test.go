@@ -1,8 +1,7 @@
-package dbmodel
+package optreflect
 
 import (
 	"testing"
-	"optreflect"
 )
 type TestObj struct {
 	field1 string	`alias:"f1"`
@@ -13,7 +12,7 @@ type TestObj struct {
 	field6 []byte
 }
 func TestOptReflect(t *testing.T) {
-	optObj:=&optreflect.OptReflect{}
+	optObj:=&OptReflect{}
 	optObj.Init(&TestObj{})
 	testObj:=TestObj{
 		field1:"test string",
