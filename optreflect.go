@@ -35,7 +35,7 @@ func (t *OptReflect) Get(obj interface{}, key string) (interface{},error) {
 	if !exist{
 		return nil,error(fmt.Errorf("%s字段不存在",key))
 	}
-	// 非指
+	// 非指针
 	on:=reflect.TypeOf(obj).Name()
 	if on==""{
 		// 如果传入引用类型
