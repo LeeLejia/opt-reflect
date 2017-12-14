@@ -151,7 +151,7 @@ func (t *OptReflect) Init(model interface{}) {
 			}
 			t.fieldsMap[alias] = field{f.Offset,kind}
 		}
-		fmt.Println(fmt.Sprintf("field:name=%s,tag=%s,type=%s,kind=%s,offset=%d,pkgPath=%s",f.Name,f.Tag.Get("db"),f.Type.Name(),kind,f.Offset,f.PkgPath))
+		//fmt.Println(fmt.Sprintf("field:name=%s,tag=%s,type=%s,kind=%s,offset=%d,pkgPath=%s",f.Name,f.Tag.Get("db"),f.Type.Name(),kind,f.Offset,f.PkgPath))
 	}
 	t.structName = elem.Name()
 }
@@ -186,32 +186,3 @@ func getInterfaceType(ptr uintptr, t string) interface{}{
 		return nil
 	}
 }
-//
-//switch t.Kind() {
-//case reflect.Bool:
-//return boolEncoder
-//case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-//return intEncoder
-//case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-//return uintEncoder
-//case reflect.Float32:
-//return float32Encoder
-//case reflect.Float64:
-//return float64Encoder
-//case reflect.String:
-//return stringEncoder
-//case reflect.Interface:
-//return interfaceEncoder
-//case reflect.Struct:
-//return newStructEncoder(t)
-//case reflect.Map:
-//return newMapEncoder(t)
-//case reflect.Slice:
-//return newSliceEncoder(t)
-//case reflect.Array:
-//return newArrayEncoder(t)
-//case reflect.Ptr:
-//return newPtrEncoder(t)
-//default:
-//return unsupportedTypeEncoder
-//}
