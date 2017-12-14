@@ -66,7 +66,9 @@ func (t *OptReflect) Set(obj interface{}, key string, value interface{}) error{
 	if n!=t.structName{
 		return error(fmt.Errorf("当前传入类型%s,需要传入%s类型结构体的引用",n,t.structName))
 	}
-	// todo
+	if value==nil{
+		return fmt.Errorf("value is nil")
+	}
 	v,exist:=t.fieldsMap[key]
 	if !exist{
 		return error(fmt.Errorf("%s字段不存在",key))
@@ -83,51 +85,23 @@ func (t *OptReflect) Set(obj interface{}, key string, value interface{}) error{
 	ptr := (*empty)(unsafe.Pointer(&obj)).ptr
 	ptr = unsafe.Pointer(uintptr(ptr) + v.offset)
 	switch v.fieldType {
-	// 基本类型
+	case "int","int8","int16","int32","int64":
+		*(* int64)(unsafe.Pointer(ptr)) = value.(int64)
+	case "uint","uint8","uint16","uint32","uint64","uintptr":
+		*(* uint64)(unsafe.Pointer(ptr)) = value.(uint64)
+	case "float32":
+		*(* float32)(unsafe.Pointer(ptr)) = value.(float32)
+	case "float64":
+		*(* float64)(unsafe.Pointer(ptr)) = value.(float64)
 	case "string":
-		v,e:=value.(string)
-		if !e{
-			return error(fmt.Errorf("断言错误"))
-		}
-		*(* string)(unsafe.Pointer(ptr)) = v
-	case "int":
-		v,e:=value.(int)
-		if !e{
-			return error(fmt.Errorf("断言错误"))
-		}
-		*(* int)(unsafe.Pointer(ptr)) = v
-	case "uint8":
-		v,e:=value.(byte)
-		if !e{
-			return error(fmt.Errorf("断言错误"))
-		}
-		*(* byte)(unsafe.Pointer(ptr)) = v
-		// 切片
-	case "slice-string":
-		//*(unsafe.Pointer(ptr)) = value.(uintptr)
-	case "slice-int":
-		//*(unsafe.Pointer(ptr)) = value.(uintptr)
-	case "slice-uint8":
-		//*(unsafe.Pointer(ptr)) = value.(uintptr)
-		// 指针
-	case "ptr-string":
-		v,e:=value.(string)
-		if !e{
-			return error(fmt.Errorf("断言错误"))
-		}
-		*(* string)(unsafe.Pointer(ptr)) = v
-	case "ptr-int":
-		v,e:=value.(int)
-		if !e{
-			return error(fmt.Errorf("断言错误"))
-		}
-		*(* int)(unsafe.Pointer(ptr)) = v
-	case "ptr-uint8":
-		v,e:=value.(byte)
-		if !e{
-			return error(fmt.Errorf("断言错误"))
-		}
-		*(* byte)(unsafe.Pointer(ptr)) = v
+		*(* string)(unsafe.Pointer(ptr)) = value.(string)
+	case "bool":
+		*(* bool)(unsafe.Pointer(ptr)) = value.(bool)
+		// todo is ok??
+	case "slice-string", "slice-int","slice-uint8":
+		*(*[]interface{})(unsafe.Pointer(ptr)) = value.([]interface{})
+	case "slice-float32","slice-float64":
+		*(* []float64)(unsafe.Pointer(ptr)) = value.([]float64)
 	default:
 		return error(fmt.Errorf("暂不支持对%s进行赋值",v.fieldType))
 	}
@@ -177,35 +151,40 @@ func (t *OptReflect) Init(model interface{}) {
 			}
 			t.fieldsMap[alias] = field{f.Offset,kind}
 		}
-		//fmt.Println(fmt.Sprintf("field:name=%s,tag=%s,type=%s,kind=%s,offset=%d,pkgPath=%s",f.Name,f.Tag.Get("db"),f.Type.Name(),kind,f.Offset,f.PkgPath))
+		fmt.Println(fmt.Sprintf("field:name=%s,tag=%s,type=%s,kind=%s,offset=%d,pkgPath=%s",f.Name,f.Tag.Get("db"),f.Type.Name(),kind,f.Offset,f.PkgPath))
 	}
 	t.structName = elem.Name()
 }
 func getInterfaceType(ptr uintptr, t string) interface{}{
 	switch t {
-	// 基本类型
+	case "int","int8","int16","int32","int64":
+		return *(* int64)(unsafe.Pointer(ptr))
+	case "uint","uint8","uint16","uint32","uint64","uintptr":
+		return *(* uint64)(unsafe.Pointer(ptr))
+	case "float32":
+		return *(* float32)(unsafe.Pointer(ptr))
+	case "float64":
+		return *(* float64)(unsafe.Pointer(ptr))
 	case "string":
 		return *(* string)(unsafe.Pointer(ptr))
-	case "int":
-		return *(* int)(unsafe.Pointer(ptr))
-	case "uint8":
-		return *(* byte)(unsafe.Pointer(ptr))
-	// 切片
+	case "bool":
+		return *(* bool)(unsafe.Pointer(ptr))
 	case "slice-string":
-		return *(* []string)(unsafe.Pointer(ptr))
-	case "slice-int":
-		return *(* []int)(unsafe.Pointer(ptr))
-	case "slice-uint8":
-		return *(* []byte)(unsafe.Pointer(ptr))
-	// 指针
-	case "ptr-string":
-		return *(* string)(unsafe.Pointer(ptr))
-	case "ptr-int":
-		return *(* int)(unsafe.Pointer(ptr))
-	case "ptr-uint8":
-		return *(* byte)(unsafe.Pointer(ptr))
+		return *(*[]string)(unsafe.Pointer(ptr))
+	case "slice-bool":
+		return *(*[]bool)(unsafe.Pointer(ptr))
+	case "slice-int","slice-int8","slice-int16","slice-int32","slice-int64":
+		return *(* []int64)(unsafe.Pointer(ptr))
+	case "slice-uint","slice-uint8","slice-uint16","slice-uint32","slice-uint64","slice-uintptr":
+		return *(* []uint64)(unsafe.Pointer(ptr))
+	case "slice-float32":
+		return *(* []float32)(unsafe.Pointer(ptr))
+	case "slice-float64":
+		return *(* []float64)(unsafe.Pointer(ptr))
+	default:
+		fmt.Println(fmt.Sprintf("不可用类别%s",t))
+		return nil
 	}
-	return nil
 }
 //
 //switch t.Kind() {
