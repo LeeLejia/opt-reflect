@@ -19,6 +19,15 @@ type empty struct {
 	ptr unsafe.Pointer
 }
 /**
+获取字段类型
+ */
+func (t *OptReflect) GetFieldType(field string) (string,error){
+	if f:=t.fieldsMap[field];f!=nil{
+		return f.fieldType,nil
+	}
+	return nil,fmt.Errorf("不存在%s字段",field)
+}
+/**
 获取结构名称
  */
 func (t *OptReflect) GetStructName() string{
